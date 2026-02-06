@@ -3,21 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Gogircin Empire - Pro V13.1</title>
+    <title>Gogircin Empire - V15 Adsgram</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script src="https://unpkg.com/@tonconnect/ui@latest/dist/tonconnect-ui.min.js"></script>
+    <script src="https://sad.adsgram.ai/js/adsgram-ad-controller.js"></script>
     <style>
-        :root { --blue: #3b82f6; --dark: #0f172a; --gold: #facc15; --dia: #00d4ff; --green: #22c55e; }
+        :root { --blue: #3b82f6; --dark: #0f172a; --gold: #facc15; --dia: #00d4ff; }
         body { margin: 0; background: #1e293b; font-family: 'Segoe UI', sans-serif; color: white; height: 100vh; overflow: hidden; }
         
         .top-bar { background: rgba(0,0,0,0.85); padding: 12px; display: flex; justify-content: space-around; border-bottom: 2px solid #334155; z-index: 10; position: relative;}
         .res b { display: block; font-size: 16px; text-align: center; }
 
         #game-stage { height: 100vh; position: absolute; top:0; width: 100%; background: linear-gradient(180deg, #4facfe 0%, #00f2fe 100%); z-index: 1; }
-        .bird { position: absolute; font-size: 45px; transition: 3s ease-in-out; z-index: 10; filter: drop-shadow(2px 4px 6px rgba(0,0,0,0.3)); }
-        .egg-anim { position: absolute; font-size: 18px; animation: toBasket 1s forwards; z-index: 5; }
-        @keyframes toBasket { to { transform: translate(var(--tx), var(--ty)) scale(0.5); opacity: 0; } }
-
         .basket { position: absolute; bottom: 130px; left: 50%; transform: translateX(-50%); font-size: 75px; cursor: pointer; z-index: 5; }
         .storage-info { position: absolute; bottom: 105px; left: 50%; transform: translateX(-50%); font-size: 12px; background: rgba(0,0,0,0.7); padding: 6px 15px; border-radius: 20px; z-index: 5; border: 1px solid var(--blue); }
 
@@ -26,13 +23,13 @@
         .menu-item { padding: 15px; border-bottom: 1px solid #1e293b; color: white; font-weight: bold; background: none; border: none; text-align: left; cursor: pointer; width: 100%; }
 
         .modal { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 85%; max-height: 80vh; background: var(--dark); border-radius: 25px; z-index: 2000; padding: 20px; display: none; overflow-y: auto; border: 2px solid var(--blue); }
-        .modal-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #334155; margin-bottom: 15px; padding-bottom: 5px; }
         .overlay { position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.85); display: none; z-index: 1500; backdrop-filter: blur(4px); }
-        .card { background: #1e293b; padding: 12px; border-radius: 15px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; border: 1px solid #334155; }
-        .btn { border: none; padding: 10px 16px; border-radius: 10px; font-weight: bold; color: white; cursor: pointer; background: var(--blue); }
+        .btn { border: none; padding: 12px; border-radius: 10px; font-weight: bold; color: white; cursor: pointer; background: var(--blue); width: 100%; margin-top: 10px; }
 
-        #mini-game-overlay { position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.9); z-index: 3000; display: none; flex-direction: column; align-items: center; justify-content: center; }
-        #mg-target { font-size: 100px; margin: 30px 0; cursor: pointer; user-select: none; }
+        #mini-game-overlay { position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.95); z-index: 3000; display: none; flex-direction: column; align-items: center; justify-content: center; }
+        .bird { position: absolute; font-size: 45px; transition: 3s ease-in-out; z-index: 10; filter: drop-shadow(2px 4px 6px rgba(0,0,0,0.3)); }
+        .egg-anim { position: absolute; font-size: 18px; animation: toBasket 1s forwards; z-index: 5; }
+        @keyframes toBasket { to { transform: translate(var(--tx), var(--ty)) scale(0.5); opacity: 0; } }
     </style>
 </head>
 <body>
@@ -50,99 +47,88 @@
     <div id="menu-toggle" onclick="toggleMenu()">🚀</div>
 
     <div id="side-panel">
-        <button class="menu-item" onclick="openModal('birds')">🦅 KUŞLARIM</button>
-        <button class="menu-item" onclick="openModal('shop')">🛒 MAĞAZA</button>
-        <button class="menu-item" onclick="openModal('wallet')">👛 CÜZDAN & ⭐</button>
-        <button class="menu-item" onclick="startMiniGame()">🎮 MİNİ OYUN</button>
-        <button class="menu-item" onclick="openModal('bonus')">🎁 GÜNLÜK</button>
+        <button class="menu-item" onclick="openModal('shop')">🛒 KUŞ SATIN AL</button>
+        <button class="menu-item" onclick="openModal('wallet')">👛 CÜZDAN & ÖDEME</button>
+        <button class="menu-item" onclick="startMiniGame()">🎮 MİNİ OYUN OYNA</button>
+        <button class="menu-item" onclick="watchAdForBonus()" style="color:var(--gold);">💎 REKLAM İZLE (+10)</button>
     </div>
 
     <div class="overlay" id="overlay" onclick="closeAll()"></div>
 
-    <div id="modal-birds" class="modal"><div class="modal-header"><h3>Kümes</h3><span onclick="closeAll()">✖</span></div><div id="birds-list"></div></div>
-    <div id="modal-shop" class="modal"><div class="modal-header"><h3>Pazar</h3><span onclick="closeAll()">✖</span></div><div id="bird-shop-list"></div></div>
-    
     <div id="modal-wallet" class="modal">
-        <div class="modal-header"><h3>Cüzdan & Ödeme</h3><span onclick="closeAll()">✖</span></div>
-        <div class="card" style="background: linear-gradient(45deg, #6366f1, #a855f7);">
-            <div><b>💎 Yıldız ile Yükle</b><br><small>1 ⭐ = 1 Elmas</small></div>
-            <button class="btn" onclick="realStarPay(50)">50 ⭐ AL</button>
+        <div style="display:flex; justify-content:space-between;"><h3>Finans Merkezi</h3><span onclick="closeAll()">✖</span></div>
+        <div style="background:#0f172a; padding:15px; border-radius:15px; margin-bottom:15px;">
+            <b>⭐ Yıldız ile Hızlı Yükle</b>
+            <button class="btn" style="background:var(--gold); color:black;" onclick="realStarPay(50)">50 ⭐ AL</button>
         </div>
-        <div class="card" style="display:block; text-align:center;">
+        <div style="background:#0f172a; padding:15px; border-radius:15px;">
             <b>👛 TON Connect</b>
             <div id="ton-connect-button" style="margin-top:10px;"></div>
             <p id="wallet-info" style="font-size:10px; color:var(--dia); margin-top:10px; word-break:break-all;"></p>
         </div>
     </div>
 
-    <div id="modal-bonus" class="modal" style="text-align:center;">
-        <div class="modal-header"><h3>Bonus</h3><span onclick="closeAll()">✖</span></div>
-        <button id="daily-btn" class="btn" style="width:100%; padding:20px;" onclick="claimDaily()">HEDİYEYİ AL 🎁</button>
+    <div id="modal-shop" class="modal">
+        <div style="display:flex; justify-content:space-between;"><h3>Kuş Pazarı</h3><span onclick="closeAll()">✖</span></div>
+        <div id="bird-shop-list"></div>
     </div>
 
     <div id="mini-game-overlay">
         <h2 id="mg-timer">10</h2>
-        <div id="mg-target" onclick="mgClick()">🥚</div>
-        <p id="mg-score">Skor: 0</p>
-        <button class="btn" style="background:red;" onclick="stopMiniGame()">VAZGEÇ</button>
+        <div id="mg-target" style="font-size:120px; cursor:pointer;" onclick="mgClick()">🥚</div>
+        <p id="mg-score" style="font-size:20px;">Skor: 0</p>
     </div>
 
 <script>
     const tg = window.Telegram.WebApp;
     tg.expand();
 
-    // 1. TON CONNECT
+    // ADSGRAM ENTEGRASYONU (BLOCK ID: 22286)
+    const AdController = window.Adsgram.init({ blockId: "22286" });
+
+    // TON CONNECT
     const tonConnectUI = new TON_CONNECT_UI.TonConnectUI({
         manifestUrl: 'https://hakk2793.github.io/gogircin-empire/tonconnect-manifest.json',
         buttonRootId: 'ton-connect-button'
     });
 
-    tonConnectUI.onStatusChange(wallet => {
-        if (wallet) {
-            document.getElementById('wallet-info').innerText = "Bağlı: " + wallet.account.address;
-            gameData.wallet = wallet.account.address;
-            save();
-        }
-    });
-
-    // 2. YILDIZ ÖDEMESİ
-    function realStarPay(amt) {
-        tg.showConfirm(`${amt} Yıldız karşılığında Elmas alınsın mı?`, (ok) => {
-            if(ok) {
-                // Not: Gerçek ödeme için BotFather'da ödemelerin açık olması ve faturanın bot tarafından kesilmesi gerekir.
-                tg.openInvoice(`https://t.me/GogircinAdminBot?start=buy_${amt}`, (status) => {
-                    if(status === 'paid') {
-                        gameData.diaBal += amt;
-                        updateUI();
-                    }
-                });
-            }
-        });
-    }
-
     // OYUN VERİSİ
     let gameData = {
-        eggBal: 100, diaBal: 50, storage: 0, maxStorage: 100, lastDaily: 0,
+        eggBal: 100, diaBal: 50, storage: 0, maxStorage: 100,
         birds: [
             { id: 0, name: "Mavi", icon: "🐦", lvl: 1, rate: 10, owned: true },
             { id: 1, name: "Sarı", icon: "🐤", lvl: 0, rate: 45, owned: false, priceDia: 50 },
-            { id: 2, name: "Yeşil", icon: "🦜", lvl: 0, rate: 150, owned: false, priceDia: 200 },
+            { id: 2, name: "Papağan", icon: "🦜", lvl: 0, rate: 150, owned: false, priceDia: 200 },
             { id: 3, name: "Kartal", icon: "🦅", lvl: 0, rate: 400, owned: false, priceDia: 1000 }
         ]
     };
 
-    if(localStorage.getItem('gogircin_v13_1')) gameData = JSON.parse(localStorage.getItem('gogircin_v13_1'));
-    function save() { localStorage.setItem('gogircin_v13_1', JSON.stringify(gameData)); }
+    if(localStorage.getItem('gogircin_v15')) gameData = JSON.parse(localStorage.getItem('gogircin_v15'));
+    function save() { localStorage.setItem('gogircin_v15', JSON.stringify(gameData)); }
 
-    function updateUI() {
-        document.getElementById('bal-egg').innerText = Math.floor(gameData.eggBal);
-        document.getElementById('bal-dia').innerText = Math.floor(gameData.diaBal);
-        document.getElementById('store-val').innerText = Math.floor(gameData.storage);
-        document.getElementById('store-max').innerText = gameData.maxStorage;
-        renderBirds(); renderShop(); save();
+    // REKLAM İZLEME
+    function watchAdForBonus() {
+        AdController.show().then(() => {
+            gameData.diaBal += 10;
+            updateUI();
+            tg.showAlert("Reklam başarıyla izlendi! +10 Elmas kazandın.");
+        }).catch(() => {
+            tg.showAlert("Reklam şu an hazır değil, lütfen sonra dene.");
+        });
     }
 
-    // MİNİ OYUN
+    // YILDIZ ÖDEME (SİMÜLASYON)
+    function realStarPay(amt) {
+        tg.showConfirm(`${amt} Yıldız ile ${amt} Elmas yüklensin mi?`, (ok) => {
+            if(ok) {
+                gameData.diaBal += amt;
+                updateUI();
+                tg.showAlert("İşlem Başarılı!");
+            }
+        });
+    }
+
+    // MİNİ OYUN SİSTEMİ
     let mgActive = false, mgScore = 0;
     function startMiniGame() {
         closeAll();
@@ -153,32 +139,43 @@
             t--; document.getElementById('mg-timer').innerText = t;
             if(t <= 0 || !mgActive) {
                 clearInterval(timer);
-                if(mgActive) tg.showAlert("Oyun Bitti! Skor: " + mgScore);
-                stopMiniGame();
-                gameData.eggBal += mgScore * 10;
-                updateUI();
+                stopMiniGame(mgScore);
             }
         }, 1000);
     }
     function mgClick() { if(mgActive) { mgScore++; document.getElementById('mg-score').innerText = "Skor: " + mgScore; } }
-    function stopMiniGame() { mgActive = false; document.getElementById('mini-game-overlay').style.display = 'none'; }
-
-    // GENEL FONKSİYONLAR
-    function toggleMenu() { const p = document.getElementById('side-panel'); p.style.display = (p.style.display === 'flex') ? 'none' : 'flex'; }
-    function openModal(id) { closeAll(); document.getElementById('overlay').style.display = 'block'; document.getElementById('modal-' + id).style.display = 'block'; }
-    function closeAll() { document.querySelectorAll('.modal').forEach(m => m.style.display = 'none'); document.getElementById('overlay').style.display = 'none'; document.getElementById('side-panel').style.display = 'none'; }
-    
-    function renderBirds() {
-        const l = document.getElementById('birds-list'); l.innerHTML = '';
-        gameData.birds.filter(b => b.owned).forEach(b => {
-            l.innerHTML += `<div class="card"><div><b>${b.icon} ${b.name}</b><br><small>${b.rate*60} 🥚/saat</small></div><button class="btn" onclick="upgradeBird(${b.id})">UP (${b.lvl*200} 🥚)</button></div>`;
+    function stopMiniGame(score) {
+        mgActive = false;
+        document.getElementById('mini-game-overlay').style.display = 'none';
+        tg.showConfirm(`Oyun bitti! Skorun: ${score}. Reklam izleyerek 2 KAT (x20) ödül almak ister misin?`, (ok) => {
+            if(ok) {
+                AdController.show().then(() => {
+                    gameData.eggBal += score * 20;
+                    updateUI();
+                    tg.showAlert("Reklam izlendi, 2 kat ödül yüklendi!");
+                }).catch(() => {
+                    gameData.eggBal += score * 10;
+                    updateUI();
+                });
+            } else {
+                gameData.eggBal += score * 10;
+                updateUI();
+            }
         });
+    }
+
+    // GENEL UI & KUŞ MANTIĞI
+    function updateUI() {
+        document.getElementById('bal-egg').innerText = Math.floor(gameData.eggBal);
+        document.getElementById('bal-dia').innerText = Math.floor(gameData.diaBal);
+        document.getElementById('store-val').innerText = Math.floor(gameData.storage);
+        renderShop(); save();
     }
 
     function renderShop() {
         const l = document.getElementById('bird-shop-list'); l.innerHTML = '';
         gameData.birds.filter(b => !b.owned).forEach(b => {
-            l.innerHTML += `<div class="card"><div><b>${b.icon} ${b.name}</b><br><small>${b.rate*60} 🥚/saat</small></div><button class="btn" onclick="buyBird(${b.id})">${b.priceDia} 💎</button></div>`;
+            l.innerHTML += `<div style="background:#1e293b; padding:12px; border-radius:15px; margin-bottom:10px; display:flex; justify-content:space-between; align-items:center; border:1px solid #334155;"><div><b>${b.icon} ${b.name}</b><br><small>${b.rate*60} 🥚/saat</small></div><button class="btn" style="width:auto; margin:0;" onclick="buyBird(${b.id})">${b.priceDia} 💎</button></div>`;
         });
     }
 
@@ -186,7 +183,7 @@
         if(gameData.diaBal >= gameData.birds[id].priceDia) {
             gameData.diaBal -= gameData.birds[id].priceDia;
             gameData.birds[id].owned = true; addBirdToStage(gameData.birds[id]); updateUI();
-        }
+        } else { tg.showAlert("Yetersiz Elmas!"); }
     }
 
     function addBirdToStage(b) {
@@ -195,33 +192,28 @@
         e.id = 'sb-' + b.id; e.className = 'bird'; e.innerHTML = b.icon;
         document.getElementById('game-stage').appendChild(e);
         setInterval(() => { e.style.left = Math.random()*80+"%"; e.style.top = (Math.random()*45+10)+"%"; }, 3000);
-        setInterval(() => createEgg(b.id), (60000 / b.rate));
+        setInterval(() => {
+            if(gameData.storage < gameData.maxStorage) {
+                createEggAnim(e);
+                gameData.storage++; updateUI();
+            }
+        }, (60000 / b.rate));
     }
 
-    function createEgg(bid) {
-        if(gameData.storage >= gameData.maxStorage) return;
-        const b = document.getElementById('sb-' + bid); if(!b) return;
+    function createEggAnim(b) {
         const eg = document.createElement('div'); eg.className = 'egg-anim'; eg.innerText = '🥚';
         eg.style.left = b.offsetLeft+"px"; eg.style.top = b.offsetTop+"px";
         eg.style.setProperty('--tx', ((window.innerWidth/2)-b.offsetLeft)+"px");
         eg.style.setProperty('--ty', ((window.innerHeight*0.75)-b.offsetTop)+"px");
         document.getElementById('game-stage').appendChild(eg);
-        setTimeout(() => { eg.remove(); gameData.storage = Math.min(gameData.storage+1, gameData.maxStorage); updateUI(); }, 1000);
+        setTimeout(() => eg.remove(), 1000);
     }
 
     function collectEggs() { if(gameData.storage > 0) { gameData.eggBal += gameData.storage; gameData.storage = 0; updateUI(); } }
-
-    function upgradeBird(id) {
-        let c = gameData.birds[id].lvl * 200;
-        if(gameData.eggBal >= c) { gameData.eggBal -= c; gameData.birds[id].lvl++; gameData.birds[id].rate *= 1.15; updateUI(); }
-    }
-
-    function claimDaily() {
-        let n = Date.now();
-        if(n - gameData.lastDaily > 86400000) { gameData.eggBal += 500; gameData.lastDaily = n; updateUI(); tg.showAlert("500 🥚 Alındı!"); }
-        else { tg.showAlert("Bugünkü ödül zaten alınmış!"); }
-    }
-
+    function toggleMenu() { const p = document.getElementById('side-panel'); p.style.display = (p.style.display === 'flex') ? 'none' : 'flex'; }
+    function openModal(id) { closeAll(); document.getElementById('overlay').style.display = 'block'; document.getElementById('modal-' + id).style.display = 'block'; }
+    function closeAll() { document.querySelectorAll('.modal').forEach(m => m.style.display = 'none'); document.getElementById('overlay').style.display = 'none'; document.getElementById('side-panel').style.display = 'none'; }
+    
     gameData.birds.filter(b => b.owned).forEach(addBirdToStage);
     updateUI();
 </script>
