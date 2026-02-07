@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="tr">
 <head><script src="https://sad.adsgram.ai/js/adsgram-ad-controller.js"></script>
+<script src="adsgram.js"></script>
 <script src="https://unpkg.com/@tonconnect/ui@latest/dist/tonconnect-ui.min.js"></script>
 
     <meta charset="UTF-8">
@@ -323,22 +324,15 @@
     // BAŞLAT
     gameData.birds.filter(b => b.owned).forEach(addBirdToStage);
     updateUI();
-</script>// ADSGRAM REKLAM FONKSİYONU
-function reklamIzle() {
-    try {
-        const AdController = window.Adsgram.init({ blockId: "22286" });
-        AdController.show().then(() => {
-            gameData.diaBal += 10;
-            updateUI();
-            alert("10 Elmas kazandın!");
-        }).catch(() => {
-            alert("Reklam şu an hazır değil.");
-        });
-    } catch (e) {
-        alert("Reklam sistemi yüklenemedi.");
-    }
+<script>
+function watchAd() {
+  showAdAndReward(() => {
+    eggs += 10; // ödül neyse
+    updateUI();
+    alert("🎉 Reklam izledin, ödül geldi!");
+  });
 }
-
+</script>
 // CÜZDAN BAĞLAMA (V11'DEKİ MEVCUT CONNECTWALLET'I BUNUNLA DEĞİŞTİR)
 function connectWallet() {
     try {
