@@ -1,172 +1,188 @@
 <!DOCTYPE html>
 <html lang="tr">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Gogircin Empire</title>
-
-<!-- ADSGRAM -->
-<script src="https://sad.adsgram.ai/js/adsgram-ad-controller.js"></script>
-
-<style>
-:root {
-  --bg:#0f172a;
-  --card:#1e293b;
-  --blue:#3b82f6;
-  --gold:#facc15;
-  --green:#22c55e;
-}
-
-body {
-  margin:0;
-  background:var(--bg);
-  color:white;
-  font-family:Arial,Helvetica,sans-serif;
-}
-
-.top {
-  display:flex;
-  justify-content:space-around;
-  padding:10px;
-  background:#020617;
-  border-bottom:2px solid #334155;
-}
-
-.res {
-  text-align:center;
-}
-.res b {
-  display:block;
-  font-size:18px;
-}
-.res.gold b { color:var(--gold); }
-
-.main {
-  padding:20px;
-}
-
-.card {
-  background:var(--card);
-  border-radius:16px;
-  padding:15px;
-  margin-bottom:15px;
-  border:1px solid #334155;
-}
-
-button {
-  width:100%;
-  padding:14px;
-  font-size:16px;
-  border:none;
-  border-radius:14px;
-  background:var(--blue);
-  color:white;
-  cursor:pointer;
-}
-button:active { transform:scale(0.97); }
-
-#adBtn {
-  background:linear-gradient(135deg,#22c55e,#16a34a);
-  font-size:18px;
-}
-
-.log {
-  font-size:13px;
-  opacity:0.8;
-  margin-top:10px;
-}
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Gogircin Empire - V10.1 Stable</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <script src="https://sad.adsgram.ai/js/adsgram-ad-controller.js"></script>
+    <script src="https://unpkg.com/@tonconnect/ui@latest/dist/tonconnect-ui.min.js"></script>
+    <style>
+        body { margin: 0; background: #1e293b; font-family: sans-serif; color: white; overflow: hidden; touch-action: manipulation; }
+        .header { background: #0f172a; padding: 15px; display: flex; justify-content: space-around; border-bottom: 2px solid #3b82f6; position: relative; z-index: 100; }
+        #game-area { height: 100vh; background: #4facfe; position: relative; z-index: 1; overflow: hidden; }
+        .bird { position: absolute; font-size: 50px; transition: 2s linear; z-index: 10; pointer-events: none; }
+        .basket { position: absolute; bottom: 120px; left: 50%; transform: translateX(-50%); font-size: 80px; cursor: pointer; z-index: 20; }
+        .menu-btn { position: fixed; bottom: 20px; right: 20px; width: 60px; height: 60px; background: #3b82f6; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 30px; cursor: pointer; z-index: 1000; border: 2px solid white; }
+        .panel { position: fixed; bottom: 90px; right: 20px; background: #0f172a; width: 200px; border-radius: 15px; display: none; flex-direction: column; border: 1px solid #3b82f6; z-index: 999; }
+        .panel-item { padding: 15px; color: white; border-bottom: 1px solid #334155; cursor: pointer; font-weight: bold; }
+        .modal { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 80%; background: #0f172a; padding: 20px; border-radius: 20px; display: none; border: 2px solid #3b82f6; z-index: 2000; }
+        .overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); display: none; z-index: 1500; }
+    </style>
 </head>
-
 <body>
 
-<!-- ÜST BAR -->
-<div class="top">
-  <div class="res gold">
-    🥚
-    <b id="eggs">0</b>
-    Yumurta
-  </div>
-</div>
+    <div class="header">
+        <div>🥚 <span id="eggs">0</span></div>
+        <div>💎 <span id="gems">50</span></div>
+    </div>
 
-<!-- OYUN -->
-<div class="main">
+    <div id="game-area">
+        <div class="basket" onclick="collect()">🧺</div>
+    </div>
 
-  <div class="card">
-    <h3>📺 Reklam İzle</h3>
-    <p>Reklam izleyerek ödül kazan.</p>
-    <button id="adBtn" onclick="watchAd()">▶ Reklam İzle (+100 🥚)</button>
-    <div class="log" id="log">Hazır</div>
-  </div>
+    <div class="menu-btn" onclick="toggleMenu()">🚀</div>
 
-  <div class="card">
-    <h3>🐦 Bilgi</h3>
-    <p>Bu demo Adsgram entegrasyonu içindir.</p>
-  </div>
+    <div id="main-panel" class="panel">
+        <div class="panel-item" onclick="openM('shop')">🛒 KUŞ AL</div>
+        <div class="panel-item" onclick="openM('wallet')">👛 CÜZDAN</div>
+        <div class="panel-item" onclick="izleReklam()" style="color: #facc15;">💎 REKLAM İZLE (+10)</div>
+    </div>
 
-</div>
+    <div id="overlay" class="overlay" onclick="closeAll()"></div>
+
+    <div id="m-shop" class="modal">
+        <h3>Pazar</h3>
+        <div id="shop-items"></div>
+        <button onclick="closeAll()" style="width:100%; margin-top:10px; padding:10px;">Kapat</button>
+    </div>
+
+    <div id="m-wallet" class="modal">
+        <h3>Cüzdan & Ödeme</h3>
+        <div id="ton-connect-button"></div>
+        <button onclick="yildizAl()" style="width:100%; background:#facc15; padding:10px; margin-top:10px; border:none; border-radius:10px; font-weight:bold; color:black;">50 ⭐ Satın Al</button>
+        <button onclick="closeAll()" style="width:100%; margin-top:10px; padding:10px;">Kapat</button>
+    </div>
 
 <script>
-/* ------------------------------
-   OYUN DATASI
--------------------------------- */
-const gameData = {
-  eggs: 0
-};
+    const tg = window.Telegram.WebApp;
+    tg.expand();
 
-function updateUI() {
-  document.getElementById("eggs").innerText = gameData.eggs;
-}
+    // OYUN VERİLERİ (V10 MANTIĞI)
+    let data = {
+        eggs: 0, gems: 50, store: 0,
+        birds: [
+            { id: 0, name: "Mavi", icon: "🐦", rate: 10, owned: true, price: 0 },
+            { id: 1, name: "Sarı", icon: "🐤", rate: 50, owned: false, price: 50 }
+        ]
+    };
 
-/* ------------------------------
-   ADSGRAM
--------------------------------- */
-let adController = null;
+    // Kayıt yükle
+    const local = localStorage.getItem('gogircin_v10_1');
+    if(local) data = JSON.parse(local);
 
-window.addEventListener("load", () => {
-  try {
-    adController = new AdsgramAdController({
-      blockId: 22286
-    });
-    log("Adsgram hazır");
-  } catch (e) {
-    log("Adsgram yüklenemedi");
-  }
-});
+    function save() { localStorage.setItem('gogircin_v10_1', JSON.stringify(data)); }
 
-function watchAd() {
-  if (!adController) {
-    alert("Reklam hazır değil");
-    return;
-  }
+    function update() {
+        document.getElementById('eggs').innerText = Math.floor(data.eggs);
+        document.getElementById('gems').innerText = Math.floor(data.gems);
+        renderShop();
+        save();
+    }
 
-  log("Reklam açılıyor...");
+    // KUŞLARI OLUŞTUR (V10'DAN ALINDI)
+    function createBird(bird) {
+        if(!bird.owned || document.getElementById('b-'+bird.id)) return;
+        const b = document.createElement('div');
+        b.id = 'b-'+bird.id;
+        b.className = 'bird';
+        b.innerHTML = bird.icon;
+        b.style.left = Math.random()*80+'%';
+        b.style.top = (Math.random()*50+10)+'%';
+        document.getElementById('game-area').appendChild(b);
+        
+        setInterval(() => {
+            b.style.left = Math.random()*80+'%';
+            b.style.top = (Math.random()*50+10)+'%';
+        }, 3000);
 
-  adController.show()
-    .then(() => {
-      gameData.eggs += 100;
-      updateUI();
-      alert("🎉 Reklam izlendi! +100 Yumurta");
-      log("Ödül verildi");
-    })
-    .catch(() => {
-      alert("❌ Reklam gösterilemedi");
-      log("Reklam iptal");
-    });
-}
+        setInterval(() => {
+            data.store += (bird.rate / 60);
+            save();
+        }, 1000);
+    }
 
-/* ------------------------------
-   LOG
--------------------------------- */
-function log(msg) {
-  document.getElementById("log").innerText = msg;
-}
+    function collect() {
+        data.eggs += data.store;
+        data.store = 0;
+        update();
+        tg.HapticFeedback.impactOccurred('light');
+    }
 
-/* ------------------------------
-   BAŞLAT
--------------------------------- */
-updateUI();
+    // REKLAM SİSTEMİ (SORUNSUZ ÇALIŞMASI İÇİN TRY-CATCH)
+    function izleReklam() {
+        try {
+            const AdController = window.Adsgram.init({ blockId: "22286" });
+            AdController.show().then(() => {
+                data.gems += 10;
+                update();
+                tg.showAlert("Tebrikler! 10 Elmas kazandın.");
+            }).catch(() => tg.showAlert("Reklam henüz hazır değil."));
+        } catch(e) { tg.showAlert("Reklam sistemi yüklenemedi."); }
+    }
+
+    function yildizAl() {
+        tg.showConfirm("50 Yıldız ile 50 Elmas alınsın mı?", (ok) => {
+            if(ok) { data.gems += 50; update(); }
+        });
+    }
+
+    // MENÜ KONTROLLERİ
+    function renderShop() {
+        const div = document.getElementById('shop-items');
+        div.innerHTML = '';
+        data.birds.forEach(b => {
+            if(!b.owned) {
+                div.innerHTML += `<div style="display:flex; justify-content:space-between; margin-bottom:10px;">
+                    <span>${b.icon} ${b.name}</span>
+                    <button onclick="buyB(${b.id})" style="background:#3b82f6; color:white; border:none; padding:5px; border-radius:5px;">${b.price} 💎</button>
+                </div>`;
+            }
+        });
+    }
+
+    function buyB(id) {
+        if(data.gems >= data.birds[id].price) {
+            data.gems -= data.birds[id].price;
+            data.birds[id].owned = true;
+            createBird(data.birds[id]);
+            update();
+        } else { tg.showAlert("Yetersiz Elmas!"); }
+    }
+
+    function toggleMenu() {
+        const p = document.getElementById('main-panel');
+        p.style.display = p.style.display === 'flex' ? 'none' : 'flex';
+    }
+
+    function openM(id) {
+        closeAll();
+        document.getElementById('overlay').style.display = 'block';
+        document.getElementById('m-'+id).style.display = 'block';
+        if(id === 'wallet') initTon();
+    }
+
+    function closeAll() {
+        document.querySelectorAll('.modal').forEach(m => m.style.display = 'none');
+        document.getElementById('overlay').style.display = 'none';
+        document.getElementById('main-panel').style.display = 'none';
+    }
+
+    function initTon() {
+        if(!window.tonButtonInit) {
+            new TON_CONNECT_UI.TonConnectUI({
+                manifestUrl: 'https://hakk2793.github.io/gogircin-empire/tonconnect-manifest.json',
+                buttonRootId: 'ton-connect-button'
+            });
+            window.tonButtonInit = true;
+        }
+    }
+
+    // BAŞLAT
+    window.onload = () => {
+        data.birds.forEach(b => { if(b.owned) createBird(b); });
+        update();
+    };
 </script>
-
 </body>
 </html>
