@@ -3,42 +3,62 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Titanic Empire - V11 Platinum</title>
-    <script src="https://sad.adsgram.ai/js/adsgram-ad-sdk.js" defer></script>
-    <script src="https://unpkg.com/@tonconnect/ui@latest/dist/tonconnect-ui.min.js" defer></script>
+    <title>Gogircin Empire - V11 Platinum</title>
     <style>
         :root { --blue: #3b82f6; --dark: #0f172a; --gold: #facc15; --diamond: #00d4ff; --purple: #a855f7; --green: #22c55e; }
         body { margin: 0; background: #1e293b; font-family: 'Segoe UI', sans-serif; color: white; height: 100vh; overflow: hidden; }
         
+        /* Üst Panel */
         .top-bar { background: rgba(0,0,0,0.85); padding: 12px; display: flex; justify-content: space-around; border-bottom: 2px solid #334155; z-index: 10; position: relative;}
         .res b { display: block; font-size: 16px; text-align: center; }
         .res.egg b { color: var(--gold); }
         .res.dia b { color: var(--diamond); }
 
-        #game-stage { height: 100vh; position: absolute; top:0; width: 100%; background: linear-gradient(180deg, #1e3a8a 0%, #1e293b 100%); z-index: 1; }
-        .bird { position: absolute; font-size: 45px; transition: 3s ease-in-out; z-index: 10; }
+        /* Oyun Sahnesi - Kuşlar 2D SVG */
+        #game-stage { height: 100vh; position: absolute; top:0; width: 100%; background: linear-gradient(180deg, #4facfe 0%, #00f2fe 100%); z-index: 1; }
+        .bird { position: absolute; width: 56px; height: 48px; transition: 3s ease-in-out; z-index: 10; filter: drop-shadow(2px 4px 6px rgba(0,0,0,0.35)); }
+        .bird svg { width: 100%; height: 100%; display: block; }
+        .bird .wing { transform-origin: center center; animation: birdFlap 0.4s ease-in-out infinite; }
+        .bird.facing-left svg { transform: scaleX(-1); }
+        @keyframes birdFlap { 0%, 100% { transform: rotate(-5deg) scaleY(1); } 50% { transform: rotate(8deg) scaleY(1.1); } }
+
         .egg-anim { position: absolute; font-size: 18px; animation: toBasket 1s forwards; z-index: 5; }
         @keyframes toBasket { to { transform: translate(var(--tx), var(--ty)) scale(0.5); opacity: 0; } }
 
-        .basket { position: absolute; bottom: 130px; left: 50%; transform: translateX(-50%); font-size: 75px; cursor: pointer; z-index: 5; }
+        .basket { position: absolute; bottom: 130px; left: 50%; transform: translateX(-50%); font-size: 75px; cursor: pointer; z-index: 5; transition: 0.1s; }
         .storage-info { position: absolute; bottom: 105px; left: 50%; transform: translateX(-50%); font-size: 12px; background: rgba(0,0,0,0.7); padding: 6px 15px; border-radius: 20px; z-index: 5; border: 1px solid var(--blue); }
 
-        #menu-toggle { position: fixed; bottom: 25px; right: 25px; width: 65px; height: 65px; background: var(--blue); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 30px; z-index: 1000; border: 3px solid white; cursor: pointer; animation: pulse 2s infinite; }
+        /* Kartlarda küçük kuş ikonu */
+        .bird-icon-card { width: 40px; height: 34px; flex-shrink: 0; display: inline-block; vertical-align: middle; margin-right: 6px; }
+        .bird-icon-card svg { width: 100%; height: 100%; }
+
+        /* Roket Menü Butonu */
+        #menu-toggle { position: fixed; bottom: 25px; right: 25px; width: 65px; height: 65px; background: var(--blue); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 30px; box-shadow: 0 6px 20px rgba(0,0,0,0.5); z-index: 1000; border: 3px solid white; cursor: pointer; animation: pulse 2s infinite; }
         @keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.1); } }
         
-        #side-panel { position: fixed; bottom: 100px; right: 25px; background: var(--dark); width: 220px; border-radius: 20px; display: none; flex-direction: column; z-index: 999; border: 1px solid var(--blue); overflow: hidden; }
-        .menu-item { padding: 15px; border-bottom: 1px solid #1e293b; color: white; font-weight: bold; background: none; border: none; text-align: left; width: 100%; }
+        #side-panel { position: fixed; bottom: 100px; right: 25px; background: var(--dark); width: 220px; border-radius: 20px; display: none; flex-direction: column; z-index: 999; border: 1px solid var(--blue); overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+        .menu-item { padding: 15px; border-bottom: 1px solid #1e293b; color: white; font-weight: bold; background: none; border: none; text-align: left; cursor: pointer; width: 100%; font-size: 14px; }
+        .menu-item:active { background: #334155; }
 
-        .modal { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 85%; max-height: 80vh; background: var(--dark); border-radius: 25px; z-index: 2000; padding: 20px; display: none; overflow-y: auto; border: 2px solid var(--blue); }
+        /* Modallar */
+        .modal { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 85%; max-height: 80vh; background: var(--dark); border-radius: 25px; z-index: 2000; padding: 20px; display: none; overflow-y: auto; border: 2px solid var(--blue); box-shadow: 0 0 40px rgba(0,0,0,0.7); }
         .modal-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #334155; margin-bottom: 15px; padding-bottom: 10px; }
         .overlay { position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.85); display: none; z-index: 1500; backdrop-filter: blur(4px); }
 
         .card { background: #1e293b; padding: 12px; border-radius: 15px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; border: 1px solid #334155; }
+        .card .card-title { display: flex; align-items: center; }
         .btn { border: none; padding: 10px 16px; border-radius: 10px; font-weight: bold; color: white; cursor: pointer; background: var(--blue); }
+        
+        /* Kayan Yazı */
+        .news-ticker { background: #0f172a; padding: 8px; border-radius: 10px; margin-top: 15px; overflow: hidden; white-space: nowrap; border: 1px solid #334155; }
+        .news-ticker span { display: inline-block; padding-left: 100%; animation: marquee 18s linear infinite; color: var(--gold); font-size: 13px; font-weight: bold; }
+        @keyframes marquee { 0% { transform: translate(0, 0); } 100% { transform: translate(-100%, 0); } }
+
+        /* Çark Görsel */
+        #wheel-display { font-size: 60px; transition: 3s cubic-bezier(0.1, 0, 0, 1); margin: 20px 0; display: inline-block; }
     </style>
 </head>
 <body>
-    <div id="ton-connect-button" style="position: fixed; top: 12px; right: 12px; z-index: 9999;"></div>
 
     <div class="top-bar">
         <div class="res egg"><span>Yumurta</span><b id="bal-egg">0</b></div>
@@ -50,34 +70,58 @@
         <div class="basket" onclick="collectEggs()">🧺</div>
     </div>
 
-    <div id="menu-toggle" onclick="toggleMenu()">🚢</div>
+    <div id="menu-toggle" onclick="toggleMenu()">🚀</div>
 
     <div id="side-panel">
         <button class="menu-item" onclick="openModal('birds')">🦅 KUŞLARIM</button>
         <button class="menu-item" onclick="openModal('shop')">🛒 MAĞAZA</button>
-        <button class="menu-item" onclick="openModal('wallet')">👛 CÜZDAN & REKLAM</button>
-        <button class="menu-item" onclick="openModal('bonus')">🎁 GÜNLÜK HEDİYE</button>
+        <button class="menu-item" onclick="openModal('wheel')">🎡 ŞANS ÇARKI</button>
+        <button class="menu-item" onclick="openModal('wallet')">👛 CÜZDAN & ELMAS</button>
+        <button class="menu-item" onclick="openModal('games')">🎮 MİNİ OYUN</button>
+        <button class="menu-item" onclick="openModal('bonus')">🎁 GÜNLÜK BONUS</button>
     </div>
 
     <div class="overlay" id="overlay" onclick="closeAll()"></div>
 
     <div id="modal-birds" class="modal">
-        <div class="modal-header"><h3>Titanic Kümesi</h3><span onclick="closeAll()">✖</span></div>
+        <div class="modal-header"><h3>Kuş Kümesi</h3><span onclick="closeAll()">✖</span></div>
         <div id="birds-list"></div>
     </div>
 
     <div id="modal-shop" class="modal">
-        <div class="modal-header"><h3>Titanic Pazarı</h3><span onclick="closeAll()">✖</span></div>
+        <div class="modal-header"><h3>Kuş Pazarı</h3><span onclick="closeAll()">✖</span></div>
         <div id="bird-shop-list"></div>
+        <div class="news-ticker">
+            <span id="ticker-text">🎉 @Admin: Gogircin Empire'a Hoş Geldiniz! • 💎 Elmas alarak hızlanabilirsin! • 🎡 Çarkta büyük ödül seni bekliyor!</span>
+        </div>
+    </div>
+
+    <div id="modal-wheel" class="modal" style="text-align:center;">
+        <div class="modal-header"><h3>Şans Çarkı</h3><span onclick="closeAll()">✖</span></div>
+        <div style="background: #1e293b; padding: 20px; border-radius: 20px; border: 2px dashed var(--gold);">
+            <div id="wheel-display">🎡</div>
+            <p id="wheel-status" style="color:var(--gold); font-weight:bold;">10 Elmas'a Çevir!</p>
+            <button id="spin-btn" class="btn" style="width:100%; background:var(--gold); color:black; margin-top:10px;" onclick="spinWheel()">ÇEVİR</button>
+        </div>
+        <p style="font-size:10px; color:#94a3b8; margin-top:10px;">Büyük Ödül: Kartal veya 100 Elmas!</p>
     </div>
 
     <div id="modal-wallet" class="modal">
         <div class="modal-header"><h3>Finans Merkezi</h3><span onclick="closeAll()">✖</span></div>
-        <button class="btn" style="width:100%; background:var(--gold); color:black; margin-bottom:15px; padding:15px;" onclick="izleReklam()">🎬 VİDEO İZLE (+10 💎)</button>
-        <div class="card">
-            <b>👛 TON Cüzdan</b>
-            <p id="wallet-display" style="font-size:11px;">Bağlı Değil</p>
+        <div class="card" style="background: linear-gradient(45deg, var(--purple), #db2777);">
+            <div><b>💎 100 Elmas Paketi</b><span>Fiyat: 50 ⭐</span></div>
+            <button class="btn" style="background:white; color:black;" onclick="buyStars(100, 50)">SATIN AL</button>
         </div>
+        <div class="card" style="display:block;">
+            <b>👛 TON Cüzdan</b>
+            <p id="wallet-display" style="font-size:11px; color:var(--diamond); word-break:break-all; margin:10px 0;">Cüzdan Bağlı Değil</p>
+            <button class="btn" style="width:100%; background:#0098ea;" onclick="connectWallet()">BAĞLA / GÜNCELLE</button>
+        </div>
+    </div>
+
+    <div id="modal-games" class="modal" style="text-align:center;">
+        <div class="modal-header"><h3>Mini Oyun</h3><span onclick="closeAll()">✖</span></div>
+        <div id="game-area"><button class="btn" onclick="startMiniGame()">OYUNU BAŞLAT</button></div>
     </div>
 
     <div id="modal-bonus" class="modal" style="text-align:center;">
@@ -87,9 +131,45 @@
     </div>
 
 <script>
-    // Görseldeki 127. satır ve sonrası düzeltildi
+    // 2D Gerçek kuş SVG'leri (yandan görünüm)
+    const BIRD_SVG = {
+        0: `<svg viewBox="0 0 56 48" xmlns="http://www.w3.org/2000/svg">
+            <ellipse cx="28" cy="26" rx="14" ry="12" fill="#2563eb" stroke="#1e40af" stroke-width="1.5"/>
+            <circle cx="42" cy="22" r="6" fill="#2563eb" stroke="#1e40af" stroke-width="1"/>
+            <path class="wing" d="M18 24 Q8 20 12 28 Q16 32 22 26 Z" fill="#3b82f6" stroke="#1e40af" stroke-width="1"/>
+            <path d="M46 20 L52 18 L50 22 L52 26 L46 24 Z" fill="#fef3c7"/>
+            <circle cx="44" cy="21" r="1.5" fill="#0f172a"/>
+        </svg>`,
+        1: `<svg viewBox="0 0 56 48" xmlns="http://www.w3.org/2000/svg">
+            <ellipse cx="28" cy="28" rx="16" ry="14" fill="#fde047" stroke="#eab308" stroke-width="1.5"/>
+            <path class="wing" d="M16 26 Q6 24 10 32 Q14 36 20 28 Z" fill="#fef08a" stroke="#eab308" stroke-width="1"/>
+            <path d="M42 24 L48 22 L46 26 L48 30 L42 28 Z" fill="#fef3c7"/>
+            <circle cx="44" cy="25" r="2" fill="#0f172a"/>
+            <path d="M20 36 Q24 42 28 38 Q32 42 36 36" stroke="#f59e0b" stroke-width="1.5" fill="none"/>
+        </svg>`,
+        2: `<svg viewBox="0 0 56 48" xmlns="http://www.w3.org/2000/svg">
+            <path d="M8 28 Q12 14 28 18 Q44 14 48 28 Q44 38 28 42 Q12 38 8 28 Z" fill="#22c55e" stroke="#16a34a" stroke-width="1.5"/>
+            <path class="wing" d="M18 26 Q10 18 14 32 Q18 38 24 28 Z" fill="#4ade80" stroke="#16a34a" stroke-width="1"/>
+            <path d="M28 10 L28 4 L32 8 L36 4 L36 14 L32 12 Z" fill="#22c55e" stroke="#16a34a"/>
+            <path d="M46 24 L50 22 L49 26 L50 30 L46 28 Z" fill="#fef3c7"/>
+            <circle cx="44" cy="25" r="1.5" fill="#0f172a"/>
+        </svg>`,
+        3: `<svg viewBox="0 0 56 48" xmlns="http://www.w3.org/2000/svg">
+            <path d="M28 8 Q36 6 44 14 L48 20 L44 26 Q36 34 28 32 Q20 34 12 26 L8 20 L12 14 Q20 6 28 8 Z" fill="#78716c" stroke="#57534e" stroke-width="1.5"/>
+            <path d="M28 12 Q20 10 14 18 L12 24 L16 28 Q24 22 28 24 Q32 22 40 28 L44 24 L42 18 Q36 10 28 12 Z" fill="#a8a29e"/>
+            <path class="wing" d="M14 24 Q4 16 6 28 Q10 36 18 30 Z" fill="#57534e" stroke="#44403c" stroke-width="1"/>
+            <path d="M44 18 L50 16 L48 22 L50 28 L44 26 Z" fill="#fef3c7" stroke="#eab308"/>
+            <circle cx="46" cy="22" r="2" fill="#0f172a"/>
+        </svg>`
+    };
+
+    function getBirdSvg(id, className) {
+        const c = className || '';
+        return `<span class="bird-icon-card ${c}">${BIRD_SVG[id] || BIRD_SVG[0]}</span>`;
+    }
+
     let gameData = {
-        eggBal: 100, diaBal: 50, storage: 0, maxStorage: 100, lastDaily: 0,
+        eggBal: 100, diaBal: 50, storage: 0, maxStorage: 100, lastDaily: 0, isVip: false, wallet: null,
         birds: [
             { id: 0, name: "Mavi", icon: "🐦", lvl: 1, rate: 10, owned: true },
             { id: 1, name: "Sarı", icon: "🐤", lvl: 0, rate: 45, owned: false, priceDia: 50 },
@@ -98,26 +178,15 @@
         ]
     };
 
-    if(localStorage.getItem('titanic_v11')) gameData = JSON.parse(localStorage.getItem('titanic_v11'));
-    function save() { localStorage.setItem('titanic_v11', JSON.stringify(gameData)); }
-
-    async function izleReklam() {
-        try {
-            const ad = window.Adsgram.init({ blockId: "22528" });
-            const result = await ad.show();
-            if (result.done) {
-                gameData.diaBal += 10;
-                updateUI();
-                alert("10 Elmas Titanic kasanıza eklendi!");
-            }
-        } catch (e) { alert("Reklam hazır değil."); }
-    }
+    if(localStorage.getItem('gogircin_v11')) gameData = JSON.parse(localStorage.getItem('gogircin_v11'));
+    function save() { localStorage.setItem('gogircin_v11', JSON.stringify(gameData)); }
 
     function updateUI() {
         document.getElementById('bal-egg').innerText = Math.floor(gameData.eggBal);
         document.getElementById('bal-dia').innerText = Math.floor(gameData.diaBal);
         document.getElementById('store-val').innerText = Math.floor(gameData.storage);
         document.getElementById('store-max').innerText = gameData.maxStorage;
+        if(gameData.wallet) document.getElementById('wallet-display').innerText = gameData.wallet;
         renderBirds(); renderShop(); checkDailyTimer(); save();
     }
 
@@ -138,12 +207,13 @@
         document.getElementById('side-panel').style.display = 'none';
     }
 
+    // KUŞLAR VE ÜRETİM - 2D kuş ikonları
     function renderBirds() {
         const list = document.getElementById('birds-list'); list.innerHTML = '';
         gameData.birds.filter(b => b.owned).forEach(b => {
             list.innerHTML += `<div class="card">
-                <div><b>${b.icon} ${b.name}</b><br><span>Lvl ${b.lvl}</span></div>
-                <button class="btn" onclick="upgradeBird(${b.id})">UP (${b.lvl * 200} 🥚)</button>
+                <div class="card-title">${getBirdSvg(b.id)}<div><b>${b.name} (Lvl ${b.lvl})</b><br><span style="color:var(--green)">${b.rate * 60} 🥚/saat</span></div></div>
+                <button class="btn" onclick="upgradeBird(${b.id})">LVL UP (${b.lvl * 200} 🥚)</button>
             </div>`;
         });
     }
@@ -152,10 +222,11 @@
         const list = document.getElementById('bird-shop-list'); list.innerHTML = '';
         gameData.birds.filter(b => !b.owned).forEach(b => {
             list.innerHTML += `<div class="card">
-                <div><b>${b.icon} ${b.name}</b></div>
+                <div class="card-title">${getBirdSvg(b.id)}<div><b>${b.name}</b><br><span>${b.rate * 60} 🥚/saat</span></div></div>
                 <button class="btn" onclick="buyBird(${b.id})">${b.priceDia} 💎</button>
             </div>`;
         });
+        if(list.innerHTML === '') list.innerHTML = '<p style="text-align:center;">Tüm kuşlar alındı!</p>';
     }
 
     function buyBird(id) {
@@ -163,13 +234,16 @@
             gameData.diaBal -= gameData.birds[id].priceDia;
             gameData.birds[id].owned = true; gameData.birds[id].lvl = 1;
             addBirdToStage(gameData.birds[id]); updateUI();
+            addTickerMessage(`🚀 @YeniÜye ${gameData.birds[id].name} kuşunu dükkandan kaptı!`);
         } else { alert("Yetersiz Elmas!"); }
     }
 
     function addBirdToStage(b) {
         if(document.getElementById('stage-bird-' + b.id)) return;
         const el = document.createElement('div');
-        el.id = 'stage-bird-' + b.id; el.className = 'bird'; el.innerHTML = b.icon;
+        el.id = 'stage-bird-' + b.id;
+        el.className = 'bird' + (Math.random() > 0.5 ? ' facing-left' : '');
+        el.innerHTML = BIRD_SVG[b.id] || BIRD_SVG[0];
         document.getElementById('game-stage').appendChild(el);
         setInterval(() => { el.style.left = Math.random() * 80 + "%"; el.style.top = (Math.random() * 45 + 10) + "%"; }, 3000);
         setInterval(() => createEgg(b.id), (60000 / b.rate));
@@ -184,19 +258,86 @@
         egg.style.setProperty('--tx', ((window.innerWidth/2) - bird.offsetLeft) + "px");
         egg.style.setProperty('--ty', ((window.innerHeight*0.75) - bird.offsetTop) + "px");
         document.getElementById('game-stage').appendChild(egg);
-        setTimeout(() => { egg.remove(); gameData.storage = Math.min(gameData.storage + 1, gameData.maxStorage); updateUI(); }, 1000);
+        setTimeout(() => { 
+            egg.remove(); 
+            gameData.storage = Math.min(gameData.storage + (gameData.isVip ? 2 : 1), gameData.maxStorage); 
+            updateUI(); 
+        }, 1000);
     }
 
-    function collectEggs() { if(gameData.storage > 0) { gameData.eggBal += gameData.storage; gameData.storage = 0; updateUI(); } }
+    function collectEggs() {
+        if(gameData.storage > 0) { gameData.eggBal += gameData.storage; gameData.storage = 0; updateUI(); }
+    }
 
     function upgradeBird(id) {
         let cost = gameData.birds[id].lvl * 200;
-        if(gameData.eggBal >= cost) { gameData.eggBal -= cost; gameData.birds[id].lvl++; gameData.birds[id].rate = Math.floor(gameData.birds[id].rate * 1.15); updateUI(); }
+        if(gameData.eggBal >= cost) {
+            gameData.eggBal -= cost; gameData.birds[id].lvl++;
+            gameData.birds[id].rate = Math.floor(gameData.birds[id].rate * 1.15);
+            updateUI();
+        }
+    }
+
+    // ŞANS ÇARKINI ÇALIŞTIR
+    function spinWheel() {
+        if (gameData.diaBal < 10) return alert("10 Elmas Gerekiyor!");
+        gameData.diaBal -= 10;
+        const btn = document.getElementById('spin-btn');
+        const display = document.getElementById('wheel-display');
+        const status = document.getElementById('wheel-status');
+        
+        btn.disabled = true;
+        status.innerText = "Dönüyor...";
+        display.style.transform = "rotate(1440deg)";
+
+        setTimeout(() => {
+            display.style.transform = "rotate(0deg)";
+            let r = Math.random();
+            let msg = "";
+
+            if (r < 0.05) {
+                let locked = gameData.birds.filter(b => !b.owned);
+                if(locked.length > 0) {
+                    let won = locked[locked.length - 1];
+                    won.owned = true; won.lvl = 1; addBirdToStage(won);
+                    msg = "🦅 EFSANE: " + won.name + " KAZANDIN!";
+                } else { msg = "💎 50 Elmas Kazandın!"; gameData.diaBal += 50; }
+            } else if (r < 0.3) {
+                msg = "💎 20 Elmas Kazandın!"; gameData.diaBal += 20;
+            } else if (r < 0.7) {
+                msg = "🥚 2500 Yumurta Kazandın!"; gameData.eggBal += 2500;
+            } else {
+                msg = "🥚 500 Yumurta!"; gameData.eggBal += 500;
+            }
+
+            status.innerText = msg;
+            btn.disabled = false;
+            addTickerMessage("🎡 Çark Sonucu: " + msg);
+            updateUI();
+        }, 3000);
+    }
+
+    function connectWallet() {
+        let a = prompt("TON Cüzdan Adresi:");
+        if(a) { gameData.wallet = a; updateUI(); addTickerMessage("👛 Bir kullanıcı cüzdanını bağladı!"); }
+    }
+
+    function buyStars(amt, stars) {
+        if(confirm(stars + " ⭐ karşılığında satın al?")) {
+            gameData.diaBal += amt;
+            addTickerMessage(`💎 @Kullanıcı ${amt} Elmas yükledi! Teşekkürler.`);
+            updateUI();
+        }
+    }
+
+    function addTickerMessage(m) {
+        const t = document.getElementById('ticker-text');
+        t.innerText = m + " • " + t.innerText;
     }
 
     function claimDaily() {
         let n = new Date().getTime();
-        if(n - gameData.lastDaily > 86400000) { gameData.eggBal += 300; gameData.lastDaily = n; updateUI(); alert("300 🥚 Titanic ödülü alındı!"); }
+        if(n - gameData.lastDaily > 86400000) { gameData.eggBal += 300; gameData.lastDaily = n; updateUI(); alert("300 🥚 Alındı!"); }
     }
 
     function checkDailyTimer() {
@@ -204,16 +345,28 @@
         document.getElementById('timer').innerText = d > 0 ? "Kalan: " + Math.floor(d/3600000) + " saat" : "Hediye Hazır!";
     }
 
-    // --- KRİTİK BAŞLATICI ---
-    window.onload = () => {
-        gameData.birds.filter(b => b.owned).forEach(addBirdToStage);
-        updateUI();
-        // GitHub deponla (gogircin-empire) uyumlu hale getirildi
-        const tonConnectUI = new TON_CONNECT_UI.TonConnectUI({
-            manifestUrl: 'https://hakk2793.github.io/gogircin-empire/tonconnect-manifest.json',
-            buttonRootId: 'ton-connect-button'
-        });
-    };
+    function startMiniGame() {
+        const area = document.getElementById('game-area');
+        area.innerHTML = '<b id="gt">10</b><h2 onclick="cg()" style="font-size:50px; cursor:pointer;">🥚</h2><p id="gs">Skor: 0</p>';
+        let s = 0, t = 10;
+        window.cg = () => { s++; document.getElementById('gs').innerText = "Skor: " + s; };
+        let i = setInterval(() => {
+            t--; document.getElementById('gt').innerText = t;
+            if(t <= 0) {
+                clearInterval(i);
+                area.innerHTML = `<h4>Süre Bitti!</h4><button class="btn" style="background:var(--green); width:100%;" onclick="claimMG(${s*5})">📺 REKLAM İZLE & ÖDÜLÜ AL</button>`;
+            }
+        }, 1000);
+    }
+
+    function claimMG(r) {
+        alert("Reklam İzleniyor...");
+        setTimeout(() => { gameData.eggBal += r; updateUI(); document.getElementById('game-area').innerHTML = '<button class="btn" onclick="startMiniGame()">TEKRAR OYNA</button>'; }, 1500);
+    }
+
+    // BAŞLAT
+    gameData.birds.filter(b => b.owned).forEach(addBirdToStage);
+    updateUI();
 </script>
 </body>
 </html>
